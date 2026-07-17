@@ -118,9 +118,52 @@
 							"outputs": [
 								{
 									"referenceName": "DS_SqlTable_Parquet1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"Table_Name": {
+											"value": "@pipeline().parameters.TableName",
+											"type": "Expression"
+										}
+									}
 								}
 							]
+						},
+						{
+							"name": "EXEC_UPDATE_WATERMARK_TABLE",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "COPYSQL_FULL_IN_CTLOAD_TABLES",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Child_Pipeline_StoreProcedure",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"TableSchema": {
+										"value": "@pipeline().parameters.TableSchema",
+										"type": "Expression"
+									},
+									"TableName": {
+										"value": "@pipeline().parameters.TableName",
+										"type": "Expression"
+									},
+									"WatermarkColumn": {
+										"value": "@pipeline().parameters.WatermarkColumn",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
